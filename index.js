@@ -1,0 +1,64 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+
+const app = express();
+app.use(bodyParser.json());
+
+// Middleware to check for accountId and apiKey
+app.use((req, res, next) => {
+  const accountId =  "790e003f-0d85-4a58-aeac-64103358dfee";
+  const apiKey = "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIzODljYjJiYjI0ZDlhMzYyM2Q4YjVjOWUzZDdmNWY5MiIsInBlcm1pc3Npb25zIjpbXSwiYWNjZXNzUnVsZXMiOlt7ImlkIjoidHJhZGluZy1hY2NvdW50LW1hbmFnZW1lbnQtYXBpIiwibWV0aG9kcyI6WyJ0cmFkaW5nLWFjY291bnQtbWFuYWdlbWVudC1hcGk6cmVzdDpwdWJsaWM6KjoqIl0sInJvbGVzIjpbInJlYWRlciJdLCJyZXNvdXJjZXMiOlsiYWNjb3VudDokVVNFUl9JRCQ6NzkwZTAwM2YtMGQ4NS00YTU4LWFlYWMtNjQxMDMzNThkZmVlIl19LHsiaWQiOiJtZXRhYXBpLXJlc3QtYXBpIiwibWV0aG9kcyI6WyJtZXRhYXBpLWFwaTpyZXN0OnB1YmxpYzoqOioiXSwicm9sZXMiOlsicmVhZGVyIiwid3JpdGVyIl0sInJlc291cmNlcyI6WyJhY2NvdW50OiRVU0VSX0lEJDo3OTBlMDAzZi0wZDg1LTRhNTgtYWVhYy02NDEwMzM1OGRmZWUiXX0seyJpZCI6Im1ldGFhcGktcnBjLWFwaSIsIm1ldGhvZHMiOlsibWV0YWFwaS1hcGk6d3M6cHVibGljOio6KiJdLCJyb2xlcyI6WyJyZWFkZXIiLCJ3cml0ZXIiXSwicmVzb3VyY2VzIjpbImFjY291bnQ6JFVTRVJfSUQkOjc5MGUwMDNmLTBkODUtNGE1OC1hZWFjLTY0MTAzMzU4ZGZlZSJdfSx7ImlkIjoibWV0YWFwaS1yZWFsLXRpbWUtc3RyZWFtaW5nLWFwaSIsIm1ldGhvZHMiOlsibWV0YWFwaS1hcGk6d3M6cHVibGljOio6KiJdLCJyb2xlcyI6WyJyZWFkZXIiLCJ3cml0ZXIiXSwicmVzb3VyY2VzIjpbImFjY291bnQ6JFVTRVJfSUQkOjc5MGUwMDNmLTBkODUtNGE1OC1hZWFjLTY0MTAzMzU4ZGZlZSJdfSx7ImlkIjoibWV0YXN0YXRzLWFwaSIsIm1ldGhvZHMiOlsibWV0YXN0YXRzLWFwaTpyZXN0OnB1YmxpYzoqOioiXSwicm9sZXMiOlsicmVhZGVyIl0sInJlc291cmNlcyI6WyJhY2NvdW50OiRVU0VSX0lEJDo3OTBlMDAzZi0wZDg1LTRhNTgtYWVhYy02NDEwMzM1OGRmZWUiXX0seyJpZCI6InJpc2stbWFuYWdlbWVudC1hcGkiLCJtZXRob2RzIjpbInJpc2stbWFuYWdlbWVudC1hcGk6cmVzdDpwdWJsaWM6KjoqIl0sInJvbGVzIjpbInJlYWRlciJdLCJyZXNvdXJjZXMiOlsiYWNjb3VudDokVVNFUl9JRCQ6NzkwZTAwM2YtMGQ4NS00YTU4LWFlYWMtNjQxMDMzNThkZmVlIl19XSwidG9rZW5JZCI6IjIwMjEwMjEzIiwiaW1wZXJzb25hdGVkIjpmYWxzZSwicmVhbFVzZXJJZCI6IjM4OWNiMmJiMjRkOWEzNjIzZDhiNWM5ZTNkN2Y1ZjkyIiwiaWF0IjoxNzIzMjg1NzgwfQ.SgaMOfcDFNtzlAhz3YnnCuNlQOP1Qk6KgBjQkLbKx_R1C4HQNqIWSD6eplhIziyjHLJfSRO7wlTXHszh99oM6Uj0kQzzCofYMUfkTfAIIiNgjRRsQhYJv4K7S7asbhh4PKnfrcRlZdKvb0dtKgsuzZbGgltcNutLxgmkXn3gmlDbEWag6qK56pf29oqJdg741ceVntK-zvz42nowm8Z0oxYdS5XuSmI2sUiKLGwgfMyJq2FvR5nQlmld68RMkdjUKKlJLz7nI6G1hgAM5pL8QA8HVTePrZoBnVartKdi61lf9haYEhWNHiiX0C-lB5XeodIkHJwUhwgKv983dcnMnb8ockUg9m-UuxOiDRE9WicCaL5qVTclXhkBrdOTljB1x87TdZjWCfILbUmYgarX6LBb73qYVH-hurZPgxK2fVqjaO4wDUoZz4tSOjXV89SHBXEr0uBt2amnOkj8jJ9kanXgAV5_Xwv1uusR-XeNMnb97qoUpfmkBZGnq67JUiwMgw9mMwFWgK8R7cqSBuOd6jX2OzLKcSX1RKTEkBdHWGWs6gswphGk8KeGwruoc-cTE8_PMZfRDEw0SbI4a_CYDm26j5uNsjsR0kg4JPe5Cqfi-Kwxw-K2ii0io0zM5BVB1QaW4TQTUZemNIyxHn7lccDyZQe9l2CcW4iter3FuoY";
+
+  if (!accountId || !apiKey) {
+    return res.status(401).send('Missing accountId or apiKey');
+  }
+
+  next();
+});
+
+// Function to post data to an external URL
+const postToExternalUrl = async (url, data) => {
+  try {
+    const response = await axios.post(url, data);
+    console.log('Posted to external URL:', response.data);
+  } catch (error) {
+    console.error('Error posting to external URL:', error);
+  }
+};
+
+// Webhook URL
+app.post('/webhook', async (req, res) => {
+  const data = req.body;
+  const accountId =  "790e003f-0d85-4a58-aeac-64103358dfee";
+  const apiKey = "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIzODljYjJiYjI0ZDlhMzYyM2Q4YjVjOWUzZDdmNWY5MiIsInBlcm1pc3Npb25zIjpbXSwiYWNjZXNzUnVsZXMiOlt7ImlkIjoidHJhZGluZy1hY2NvdW50LW1hbmFnZW1lbnQtYXBpIiwibWV0aG9kcyI6WyJ0cmFkaW5nLWFjY291bnQtbWFuYWdlbWVudC1hcGk6cmVzdDpwdWJsaWM6KjoqIl0sInJvbGVzIjpbInJlYWRlciJdLCJyZXNvdXJjZXMiOlsiYWNjb3VudDokVVNFUl9JRCQ6NzkwZTAwM2YtMGQ4NS00YTU4LWFlYWMtNjQxMDMzNThkZmVlIl19LHsiaWQiOiJtZXRhYXBpLXJlc3QtYXBpIiwibWV0aG9kcyI6WyJtZXRhYXBpLWFwaTpyZXN0OnB1YmxpYzoqOioiXSwicm9sZXMiOlsicmVhZGVyIiwid3JpdGVyIl0sInJlc291cmNlcyI6WyJhY2NvdW50OiRVU0VSX0lEJDo3OTBlMDAzZi0wZDg1LTRhNTgtYWVhYy02NDEwMzM1OGRmZWUiXX0seyJpZCI6Im1ldGFhcGktcnBjLWFwaSIsIm1ldGhvZHMiOlsibWV0YWFwaS1hcGk6d3M6cHVibGljOio6KiJdLCJyb2xlcyI6WyJyZWFkZXIiLCJ3cml0ZXIiXSwicmVzb3VyY2VzIjpbImFjY291bnQ6JFVTRVJfSUQkOjc5MGUwMDNmLTBkODUtNGE1OC1hZWFjLTY0MTAzMzU4ZGZlZSJdfSx7ImlkIjoibWV0YWFwaS1yZWFsLXRpbWUtc3RyZWFtaW5nLWFwaSIsIm1ldGhvZHMiOlsibWV0YWFwaS1hcGk6d3M6cHVibGljOio6KiJdLCJyb2xlcyI6WyJyZWFkZXIiLCJ3cml0ZXIiXSwicmVzb3VyY2VzIjpbImFjY291bnQ6JFVTRVJfSUQkOjc5MGUwMDNmLTBkODUtNGE1OC1hZWFjLTY0MTAzMzU4ZGZlZSJdfSx7ImlkIjoibWV0YXN0YXRzLWFwaSIsIm1ldGhvZHMiOlsibWV0YXN0YXRzLWFwaTpyZXN0OnB1YmxpYzoqOioiXSwicm9sZXMiOlsicmVhZGVyIl0sInJlc291cmNlcyI6WyJhY2NvdW50OiRVU0VSX0lEJDo3OTBlMDAzZi0wZDg1LTRhNTgtYWVhYy02NDEwMzM1OGRmZWUiXX0seyJpZCI6InJpc2stbWFuYWdlbWVudC1hcGkiLCJtZXRob2RzIjpbInJpc2stbWFuYWdlbWVudC1hcGk6cmVzdDpwdWJsaWM6KjoqIl0sInJvbGVzIjpbInJlYWRlciJdLCJyZXNvdXJjZXMiOlsiYWNjb3VudDokVVNFUl9JRCQ6NzkwZTAwM2YtMGQ4NS00YTU4LWFlYWMtNjQxMDMzNThkZmVlIl19XSwidG9rZW5JZCI6IjIwMjEwMjEzIiwiaW1wZXJzb25hdGVkIjpmYWxzZSwicmVhbFVzZXJJZCI6IjM4OWNiMmJiMjRkOWEzNjIzZDhiNWM5ZTNkN2Y1ZjkyIiwiaWF0IjoxNzIzMjg1NzgwfQ.SgaMOfcDFNtzlAhz3YnnCuNlQOP1Qk6KgBjQkLbKx_R1C4HQNqIWSD6eplhIziyjHLJfSRO7wlTXHszh99oM6Uj0kQzzCofYMUfkTfAIIiNgjRRsQhYJv4K7S7asbhh4PKnfrcRlZdKvb0dtKgsuzZbGgltcNutLxgmkXn3gmlDbEWag6qK56pf29oqJdg741ceVntK-zvz42nowm8Z0oxYdS5XuSmI2sUiKLGwgfMyJq2FvR5nQlmld68RMkdjUKKlJLz7nI6G1hgAM5pL8QA8HVTePrZoBnVartKdi61lf9haYEhWNHiiX0C-lB5XeodIkHJwUhwgKv983dcnMnb8ockUg9m-UuxOiDRE9WicCaL5qVTclXhkBrdOTljB1x87TdZjWCfILbUmYgarX6LBb73qYVH-hurZPgxK2fVqjaO4wDUoZz4tSOjXV89SHBXEr0uBt2amnOkj8jJ9kanXgAV5_Xwv1uusR-XeNMnb97qoUpfmkBZGnq67JUiwMgw9mMwFWgK8R7cqSBuOd6jX2OzLKcSX1RKTEkBdHWGWs6gswphGk8KeGwruoc-cTE8_PMZfRDEw0SbI4a_CYDm26j5uNsjsR0kg4JPe5Cqfi-Kwxw-K2ii0io0zM5BVB1QaW4TQTUZemNIyxHn7lccDyZQe9l2CcW4iter3FuoY";
+
+  // Log the received request
+  console.log('Received:', data);
+
+  try {
+    const url = `https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/${accountId}/trade?api_key=${apiKey}`
+    // Post the close position action to the external URL
+    await postToExternalUrl(url, {
+      actionType: 'POSITIONS_CLOSE_SYMBOL',
+      symbol: data.symbol
+    });
+
+    await postToExternalUrl(url, {
+      actionType: `ORDER_TYPE_${data.action}`,
+      symbol: data.symbol,
+      volume: data.volume
+    });
+
+    res.status(200).send('Sell order executed and posted to external URL');
+  } catch (error) {
+    console.error('Error executing actions:', error);
+    res.status(500).send('Error executing actions');
+  }
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Webhook server is running on port ${PORT}`);
+});
