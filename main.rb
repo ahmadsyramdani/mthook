@@ -63,7 +63,7 @@ post '/webhook' do
 
     # Post the new order action to the external URL
     order_response = post_to_external_url(url, {
-      actionType: "ORDER_TYPE_#{action}",
+      actionType: "ORDER_TYPE_#{action.upcase}",
       symbol: symbol,
       volume: volume
     }, api_key)
