@@ -1,0 +1,31 @@
+Arguments: 
+  /usr/local/bin/node /Users/ahmadramdani/.yarn/bin/yarn.js add express
+
+PATH: 
+  /usr/local/opt/postgresql@14/bin:/Users/ahmadramdani/.yarn/bin:/Users/ahmadramdani/.config/yarn/global/node_modules/.bin:/Users/ahmadramdani/.rbenv/shims:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Applications/iTerm.app/Contents/Resources/utilities:/Applications/Docker.app/Contents/Resources/bin/
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  14.15.5
+
+Platform: 
+  darwin x64
+
+Trace: 
+  SyntaxError: /Users/ahmadramdani/Documents/PROJECTS/MTHOOK/package.json: Unexpected end of JSON input
+      at JSON.parse (<anonymous>)
+      at /Users/ahmadramdani/.yarn/lib/cli.js:1629:59
+      at Generator.next (<anonymous>)
+      at step (/Users/ahmadramdani/.yarn/lib/cli.js:310:30)
+      at /Users/ahmadramdani/.yarn/lib/cli.js:321:13
+
+npm manifest: 
+  
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
