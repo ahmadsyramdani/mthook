@@ -5,47 +5,48 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-// Middleware to check for accountId and apiKey
-app.use((req, res, next) => {
-  next();
-});
-
 // Function to post data to an external URL
 const postToExternalUrl = async (url, data) => {
   try {
     const response = await axios.post(url, data);
     console.log('Posted to external URL:', response.data);
   } catch (error) {
-    console.error('Error posting to external URL:', error);
+    console.error('Error posting to external URL:', error.message);
+    throw new Error('Failed to post data to external URL');
   }
 };
 
 // Webhook URL
 app.post('/webhook', async (req, res) => {
-  const data = req.body;
-  const accountId =  data.accountId;
-  const apiKey = data.apiKey;
+  const { accountId, apiKey, symbol, action, volume } = req.body;
 
   // Log the received request
-  console.log('Received:', data);
+  console.log('Received:', req.body);
+
+  // Basic validation
+  if (!accountId || !apiKey || !symbol || !action || !volume) {
+    return res.status(400).send('Missing required fields');
+  }
 
   try {
-    const url = `https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/${accountId}/trade?api_key=${apiKey}`
+    const url = `https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/${accountId}/trade?api_key=${apiKey}`;
+
     // Post the close position action to the external URL
     await postToExternalUrl(url, {
       actionType: 'POSITIONS_CLOSE_SYMBOL',
-      symbol: data.symbol
+      symbol
     });
 
+    // Post the new order action to the external URL
     await postToExternalUrl(url, {
-      actionType: `ORDER_TYPE_${data.action}`,
-      symbol: data.symbol,
-      volume: data.volume
+      actionType: `ORDER_TYPE_${action}`,
+      symbol,
+      volume
     });
 
-    res.status(200).send('Sell order executed and posted to external URL');
+    res.status(200).send('Order executed and posted to external URL');
   } catch (error) {
-    console.error('Error executing actions:', error);
+    console.error('Error executing actions:', error.message);
     res.status(500).send('Error executing actions');
   }
 });
