@@ -8,6 +8,7 @@ app.use(bodyParser.json());
 // Function to post data to an external URL
 const postToExternalUrl = async (url, data) => {
   try {
+    console.log('Posting data to external URL:', JSON.stringify(data, null, 2)); // Improved logging
     const response = await axios.post(url, data);
     console.log('Posted to external URL:', response.data);
   } catch (error) {
@@ -21,7 +22,7 @@ app.post('/webhook', async (req, res) => {
   const { accountId, apiKey, symbol, action, volume } = req.body;
 
   // Log the received request
-  console.log('Received:', req.body);
+  console.log('Received:', JSON.stringify(req.body, null, 2)); // Improved logging
 
   // Basic validation
   if (!accountId || !apiKey || !symbol || !action || !volume) {
