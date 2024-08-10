@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: mthook
-    runtime: ruby
-    buildCommand: "./bin/render-build.sh"
-    startCommand: "rackup -p $PORT"
-    plan: free
