@@ -5,10 +5,22 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
+// Middleware to log raw request body
+app.use((req, res, next) => {
+  req.rawBody = '';
+  req.on('data', chunk => {
+    req.rawBody += chunk.toString();
+  });
+  req.on('end', () => {
+    console.log('Raw Body:', req.rawBody); // Log raw body for debugging
+    next();
+  });
+});
+
 // Function to post data to an external URL
 const postToExternalUrl = async (url, data) => {
   try {
-    console.log('Posting data to external URL:', JSON.stringify(data, null, 2)); // Improved logging
+    console.log('Posting data to external URL:', JSON.stringify(data, null, 2));
     const response = await axios.post(url, data);
     console.log('Posted to external URL:', response.data);
   } catch (error) {
@@ -22,7 +34,7 @@ app.post('/webhook', async (req, res) => {
   const { accountId, apiKey, symbol, action, volume } = req.body;
 
   // Log the received request
-  console.log('Received:', JSON.stringify(req.body, null, 2)); // Improved logging
+  console.log('Received:', JSON.stringify(req.body, null, 2));
 
   // Basic validation
   if (!accountId || !apiKey || !symbol || !action || !volume) {
