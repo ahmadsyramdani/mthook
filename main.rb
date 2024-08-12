@@ -80,7 +80,7 @@ post '/webhook' do
       trailing_stop_params = {
         trailingStopLoss: {
           distance: {
-            distance": trailing_stop,
+            distance: trailing_stop,
             units: "RELATIVE_POINTS"
           }
         }
