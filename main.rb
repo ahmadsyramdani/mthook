@@ -82,6 +82,16 @@ post '/webhook' do
           distance: {
             distance: trailing_stop,
             units: "RELATIVE_POINTS"
+          },
+          threshold: {
+            thresholds: [
+              {
+                threshold: 100,
+                stopLoss: 20
+              }
+            ],
+            units: "RELATIVE_POINTS",
+            stopPriceBase: "CURRENT_PRICE"
           }
         }
       }
