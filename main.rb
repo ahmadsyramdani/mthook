@@ -86,8 +86,8 @@ post '/webhook' do
           threshold: {
             thresholds: [
               {
-                threshold: 100,
-                stopLoss: 20
+                threshold: trailing_stop,
+                stopLoss: 0
               }
             ],
             units: "RELATIVE_POINTS",
