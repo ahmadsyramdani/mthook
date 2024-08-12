@@ -42,6 +42,8 @@ post '/webhook' do
   symbol = request_data['symbol']
   action = request_data['action']
   volume = request_data['volume']
+  stop_loss = request_data['sl']
+  trailing_stop = request_data['tsl']
   auth_token = request_data['authToken'] # Get the auth-token from the request body
 
   # Basic validation
@@ -61,12 +63,33 @@ post '/webhook' do
     # Log the response to check for any issues
     puts "Close Position Response: #{close_position_response.body}"
 
-    # Post the new order action to the external URL
-    order_response = post_to_external_url(url, {
+    base_req = {
       actionType: "ORDER_TYPE_#{action.upcase}",
       symbol: symbol,
-      volume: volume
-    }, api_key)
+      volume: volume,
+    }
+    if stop_loss > 0
+      stop_loss_params = {
+        stopLoss: stop_loss,
+        stopLossUnits: "RELATIVE_POINTS"
+      }
+      base_req = base_req.merge(stop_loss_params)
+    end
+
+    if trailing_stop > 0
+      trailing_stop_params = {
+        trailingStopLoss: {
+          distance: {
+            distance": trailing_stop,
+            units: "RELATIVE_POINTS"
+          }
+        }
+      }
+      base_req = base_req.merge(trailing_stop_params)
+    end
+
+    # Post the new order action to the external URL
+    order_response = post_to_external_url(url, base_req, api_key)
 
     # Log the response to check for any issues
     puts "Order Response: #{order_response.body}"
