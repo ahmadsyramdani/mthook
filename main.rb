@@ -68,7 +68,7 @@ post '/webhook' do
       symbol: symbol,
       volume: volume,
     }
-    if stop_loss > 0
+    if stop_loss.to_i > 0
       stop_loss_params = {
         stopLoss: stop_loss,
         stopLossUnits: "RELATIVE_POINTS"
@@ -76,7 +76,7 @@ post '/webhook' do
       base_req = base_req.merge(stop_loss_params)
     end
 
-    if trailing_stop > 0
+    if trailing_stop.to_i > 0
       trailing_stop_params = {
         trailingStopLoss: {
           distance: {
