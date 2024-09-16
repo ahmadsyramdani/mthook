@@ -43,6 +43,7 @@ post '/webhook' do
   action = request_data['action']
   volume = request_data['volume']
   stop_loss = request_data['sl']
+  take_profit = request_data['tp']
   trailing_stop = request_data['tsl']
   auth_token = request_data['authToken'] # Get the auth-token from the request body
 
@@ -74,6 +75,14 @@ post '/webhook' do
         stopLossUnits: "RELATIVE_POINTS"
       }
       base_req = base_req.merge(stop_loss_params)
+    end
+
+    if take_profit && take_profit.to_i > 0
+      take_profit_params = {
+        takeProfit: take_profit,
+        takeProfitUnits: "RELATIVE_POINTS"
+      }
+      base_req = base_req.merge(take_profit_params)
     end
 
     if trailing_stop && trailing_stop.to_i > 0
